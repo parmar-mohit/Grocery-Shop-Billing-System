@@ -1,0 +1,83 @@
+CREATE DATABASE billing_system;
+
+CREATE USER 'shop_user' IDENTIFIED BY 'shop_pass';
+
+GRANT ALL PRIVILEGES ON billing_system.* TO 'shop_user';
+FLUSH PRIVILEGES;
+
+CREATE TABLE product (
+	p_id INT PRIMARY KEY,
+	p_name VARCHAR(50) NOT NULL,
+	s_price FLOAT NOT NULL,
+	c_price FLOAT NOT NULL,
+	inventory FLOAT NOT NULL,
+	unit INT NOT NULL, 		//on admin side 1 for kg, 3 for litre, 4 for pcs  on operator side 0 for gms and 2 for ml
+	tax_rate float NOT NULL,
+	category INT
+	);
+
+CREATE TABLE user (
+	username VARCHAR(50) PRIMARY KEY,
+	password VARCHAR(50) NOT NULL,
+	emp_id VARCHAR(50) NOT NULL
+	);
+
+CREATE TABLE customer(
+	c_id INT PRIMARY KEY,
+	c_name VARCHAR(50) NOT NULL,
+	email VARCHAR(50),
+	phone VARCHAR(50),
+	UNIQUE(email),
+	UNIQUE(phone)
+	);
+
+CREATE TABLE discount (
+	discount_code VARCHAR(50) PRIMARY KEY,
+	type INT NOT NULL,		// 1 for fixed amount 2 for percent type
+	value INT NOT NULL,
+	min_pur_amt INT
+	);
+
+CREATE TABLE bill (
+	b_id INT PRIMARY KEY,
+	date DATE NOT NULL
+	);
+
+CREATE TABLE bill_with_discount (
+	b_id INT,
+	discount_code VARCHAR(50),
+	PRIMARY KEY(b_id),
+	FOREIGN KEY(b_id) REFERENCES bill(b_id) ON DELETE CASCADE,
+	FOREIGN KEY(discount_code) REFERENCES discount(discount_code) ON DELETE SET NULL	
+	);
+
+CREATE TABLE creates (
+	username VARCHAR(50),
+	b_id INT,
+	FOREIGN KEY(username) REFERENCES user(username) ON DELETE SET NULL,
+	FOREIGN KEY(b_id) REFERENCES bill(b_id) ON DELETE CASCADE
+	);
+
+CREATE TABLE bill_contents (
+	b_id INT,
+	p_id INT,
+	quantity FLOAT,
+	FOREIGN KEY(b_id) REFERENCES bill(b_id) ON DELETE CASCADE,
+	FOREIGN KEY(p_id) REFERENCES product(p_id) ON DELETE SET NULL
+	);
+
+CREATE TABLE receipent (
+	c_id INT,
+	b_id INT,
+	FOREIGN KEY(c_id) REFERENCES customer(c_id) ON DELETE CASCADE,
+	FOREIGN KEY(b_id) REFERENCES bill(b_id) ON DELETE CASCADE
+	);
+
+CREATE TABLE product_category (
+    cat_id INT PRIMARY KEY,
+    category_name VARCHAR(50),
+    UNIQUE(category_name);
+    );
+
+ALTER TABlE product
+ADD FOREIGN KEY(category) REFERENCES product_category(cat_id) ON DELETE SET NULL;
