@@ -72,7 +72,7 @@ public class UpdateProductInfoPanel extends JPanel implements ActionListener,Win
         try{
             db = new DatabaseCon();
 
-            ResultSet result = db.executeQuery("SELECT product.*,category_name FROM product JOIN product_category WHERE product.category=product_category.cat_id;");
+            ResultSet result = db.executeQuery("SELECT product.*,category_name FROM product JOIN product_category WHERE product.category=product_category.cat_id ORDER BY product.p_id;");
 
             if( !result.next()  ){
                 messageLabel.setText("No Product Data Found");
