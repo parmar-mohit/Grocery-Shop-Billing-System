@@ -86,7 +86,7 @@ public class AdminFrame extends JFrame implements ActionListener {
         }else if( e.getSource() == salesHistoryButton ){
             //optionPanel = new PurchaseHistoryPanel();
         }else if(e.getSource()==customerListButton){
-            //optionPanel = new CustomerListPanel();
+            optionPanel = new CustomerListPanel();
         } else if(e.getSource() == discountCodeButton ) {
             optionPanel = new DiscountCodePanel();
         }else if( e.getSource() == deleteDiscountButton ){

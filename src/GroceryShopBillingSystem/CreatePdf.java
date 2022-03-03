@@ -18,7 +18,7 @@ public class CreatePdf {
          PdfWriter.getInstance(document, new FileOutputStream("Bill.pdf"));
          document.open();
          PdfPTable table = new PdfPTable(7);
-         addTableHeader(table);
+         addTableHeaderBill(table);
          table.setTotalWidth(1200);
          table.setWidths(new int[]{2,10,3,4,4,4,3});
 
@@ -138,8 +138,45 @@ public class CreatePdf {
          document.close();
      }
 
-    private static void addTableHeader(PdfPTable table) {
+    private static void addTableHeaderBill(PdfPTable table) {
         Stream.of("Sr No", "Particulars", "Product Id","Quantity","Rate","Value","Tax(%)")
+                .forEach(columnTitle -> {
+                    PdfPCell header = new PdfPCell();
+                    header.setBackgroundColor(new BaseColor(60,122,37));
+                    header.setPhrase(new Phrase(columnTitle));
+                    table.addCell(header);
+                });
+    }
+
+    public static void CreateCustomerList() throws Exception {
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream("Customer List.pdf"));
+        document.open();
+        PdfPTable table = new PdfPTable(4);
+        addTableHeaderCustomer(table);
+
+        DatabaseCon db=null;
+        try{
+            db = new DatabaseCon();
+            ResultSet result = db.executeQuery("SELECT * FROM customer;");
+            while( result.next() ){
+                table.addCell(result.getInt("c_id")+"");
+                table.addCell(result.getString("c_name"));
+                table.addCell(result.getString("email"));
+                table.addCell(result.getString("phone"));
+            }
+        }catch(Exception e){
+            System.out.println(e);
+        }finally {
+            db.closeConnection();
+        }
+
+        document.add(table);
+        document.close();
+    }
+
+    private static void addTableHeaderCustomer(PdfPTable table) {
+        Stream.of("Id","Name","Email","Phone")
                 .forEach(columnTitle -> {
                     PdfPCell header = new PdfPCell();
                     header.setBackgroundColor(new BaseColor(60,122,37));
