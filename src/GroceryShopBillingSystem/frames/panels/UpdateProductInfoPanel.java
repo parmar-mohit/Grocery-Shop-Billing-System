@@ -1,6 +1,7 @@
 package GroceryShopBillingSystem.frames.panels;
 
 import GroceryShopBillingSystem.DatabaseCon;
+import GroceryShopBillingSystem.frames.dialog.UpdateProductCategoryDialog;
 import GroceryShopBillingSystem.frames.dialog.UpdateProductInfoDialog;
 //import GroceryShopBillingSystem.frames.dialog.UpdateProductInfoDialog;
 
@@ -121,6 +122,13 @@ public class UpdateProductInfoPanel extends JPanel implements ActionListener,Win
 
             try {
                 JDialog dialog = new UpdateProductInfoDialog((JFrame) SwingUtilities.getWindowAncestor(this), (int) tableModel.getValueAt(row, 1));
+                dialog.addWindowListener(this);
+            } catch (Exception excp) {
+                System.out.println(excp);
+            }
+        }else if( e.getSource() == updateCategoryButton ){
+            try {
+                JDialog dialog = new UpdateProductCategoryDialog((JFrame) SwingUtilities.getWindowAncestor(this));
                 dialog.addWindowListener(this);
             } catch (Exception excp) {
                 System.out.println(excp);
