@@ -1,6 +1,7 @@
 package GroceryShopBillingSystem.frames.dialog;
 
 import GroceryShopBillingSystem.DatabaseCon;
+import GroceryShopBillingSystem.frames.panels.ChangeByPanel;
 import GroceryShopBillingSystem.frames.panels.SetToPanel;
 
 import javax.swing.*;
@@ -12,14 +13,13 @@ import java.sql.ResultSet;
 import static GroceryShopBillingSystem.Constraint.setPosition;
 
 public class UpdateProductCategoryDialog extends JDialog implements ActionListener {
-    private JLabel selectCategoryLabel,updateTypeLabel,messageLabel;
+    private JLabel selectCategoryLabel,updateTypeLabel;
     private JComboBox categoryCombobox;
     private JRadioButton setRadioButton, changeByRadioButton;
     private ButtonGroup typeButtonGroup;
     private JPanel optionPanel;
     private DatabaseCon db;
     private JFrame parent;
-    private JButton updateButton;
 
     public UpdateProductCategoryDialog(JFrame parent){
         super(parent);
@@ -33,8 +33,6 @@ public class UpdateProductCategoryDialog extends JDialog implements ActionListen
         typeButtonGroup = new ButtonGroup();
         typeButtonGroup.add(setRadioButton);
         typeButtonGroup.add(changeByRadioButton);
-        messageLabel = new JLabel();
-        updateButton = new JButton("Update Category Info");
 
         //Filling Combobox
         fillCombobox();
@@ -42,6 +40,9 @@ public class UpdateProductCategoryDialog extends JDialog implements ActionListen
         //Editing RadioButton
         setRadioButton.setBackground(new Color(148,212,66));
         changeByRadioButton.setBackground(new Color(148,212,66));
+
+        //Adding ActionListener
+        categoryCombobox.addActionListener(this);
         setRadioButton.addActionListener(this);
         changeByRadioButton.addActionListener(this);
 
@@ -57,8 +58,6 @@ public class UpdateProductCategoryDialog extends JDialog implements ActionListen
         //Adding Member to Dialog
         add(selectCategoryLabel,setPosition(0,0));add(categoryCombobox,setPosition(1,0,2,1));
         add(updateTypeLabel,setPosition(0,1));add(setRadioButton,setPosition(1,1));add(changeByRadioButton,setPosition(2,1));
-        add(messageLabel,setPosition(0,3,3,1));
-        add(updateButton,setPosition(0,4,3,1));
         revalidate();
         repaint();
     }
@@ -79,19 +78,39 @@ public class UpdateProductCategoryDialog extends JDialog implements ActionListen
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if( optionPanel !=  null ){
-            remove(optionPanel);
+        if( e.getSource() == categoryCombobox ) {
+            if(optionPanel == null){
+                return;
+            }else{
+                remove(optionPanel);
+
+                if( setRadioButton.isSelected() ){
+                    optionPanel = new SetToPanel(categoryCombobox.getSelectedItem() + "");
+                }else{
+                    optionPanel = new ChangeByPanel(categoryCombobox.getSelectedItem() + "");
+                }
+
+                add(optionPanel, setPosition(0, 2, 3, 1));
+                optionPanel.setVisible(true);
+                revalidate();
+                repaint();
+            }
+        }else {
+
+            if (optionPanel != null) {
+                remove(optionPanel);
+            }
+
+            if (e.getSource() == setRadioButton) {
+                optionPanel = new SetToPanel(categoryCombobox.getSelectedItem() + "");
+            } else if (e.getSource() == changeByRadioButton) {
+                optionPanel = new ChangeByPanel(categoryCombobox.getSelectedItem() + "");
+            }
+
+            add(optionPanel, setPosition(0, 2, 3, 1));
+            optionPanel.setVisible(true);
+            revalidate();
+            repaint();
         }
-
-        if( e.getSource() == setRadioButton ){
-            optionPanel = new SetToPanel();
-        }else if( e.getSource() == changeByRadioButton)
-
-        add(optionPanel,setPosition(0,2,3,1));
-        optionPanel.setVisible(true);
-        revalidate();
-        repaint();
     }
-
-
 }

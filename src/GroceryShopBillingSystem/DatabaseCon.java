@@ -60,6 +60,46 @@ public class DatabaseCon {
         preparedStatement.executeUpdate();
     }
 
+    public void updateCategorySet(String category_name,float s_price,float tax) throws Exception {
+        PreparedStatement preparedStatement = db.prepareStatement("UPDATE product SET s_price=?,tax_rate=? WHERE category = ( SELECT cat_id FROM product_category WHERE category_name = ? );");
+        preparedStatement.setFloat(1,s_price);
+        preparedStatement.setFloat(2,tax);
+        preparedStatement.setString(3,category_name);
+        preparedStatement.executeUpdate();
+    }
+
+    public void updateCategoryFixedIncrement(String category_name,float s_price,float tax) throws Exception {
+        PreparedStatement preparedStatement = db.prepareStatement("UPDATE product SET s_price = s_price + ?,tax_rate = tax_rate + ? WHERE category = ( SELECT cat_id FROM product_category WHERE category_name = ? );");
+        preparedStatement.setFloat(1,s_price);
+        preparedStatement.setFloat(2,tax);
+        preparedStatement.setString(3,category_name);
+        preparedStatement.executeUpdate();
+    }
+
+    public void updateCategoryFixedDecrement(String category_name,float s_price,float tax) throws Exception {
+        PreparedStatement preparedStatement = db.prepareStatement("UPDATE product SET s_price = s_price - ?,tax_rate = tax_rate - ? WHERE category = ( SELECT cat_id FROM product_category WHERE category_name = ? );");
+        preparedStatement.setFloat(1,s_price);
+        preparedStatement.setFloat(2,tax);
+        preparedStatement.setString(3,category_name);
+        preparedStatement.executeUpdate();
+    }
+
+    public void updateCategoryPercentIncrement(String category_name,float s_price,float tax) throws Exception {
+        PreparedStatement preparedStatement = db.prepareStatement("UPDATE product SET s_price = (s_price + (s_price/100)*?),tax_rate = (tax_rate + (tax_rate/100)*?) WHERE category = ( SELECT cat_id FROM product_category WHERE category_name = ? );");
+        preparedStatement.setFloat(1,s_price);
+        preparedStatement.setFloat(2,tax);
+        preparedStatement.setString(3,category_name);
+        preparedStatement.executeUpdate();
+    }
+
+    public void updateCategoryPercentDecrement(String category_name,float s_price,float tax) throws Exception {
+        PreparedStatement preparedStatement = db.prepareStatement("UPDATE product SET s_price = (s_price - (s_price/100)*?),tax_rate = (tax_rate - (tax_rate/100)*?) WHERE category = ( SELECT cat_id FROM product_category WHERE category_name = ? );");
+        preparedStatement.setFloat(1,s_price);
+        preparedStatement.setFloat(2,tax);
+        preparedStatement.setString(3,category_name);
+        preparedStatement.executeUpdate();
+    }
+
     public void addProduct(int productCode,String productName,float sellingPrice,float costPrice,int unit,String category,float inventory,float tax) throws Exception {
         PreparedStatement preparedStatement = db.prepareStatement("INSERT INTO product VALUES(?,?,?,?,?,?,?,(SELECT cat_id FROM product_category WHERE category_name=?));");
         preparedStatement.setInt(1,productCode);

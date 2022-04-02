@@ -229,6 +229,7 @@ public class BillingFrame extends JFrame implements ActionListener, KeyListener 
                     ResultSet result = db.getProductInfo(productId);
                     result.next();
                     tableModel.addRow(new Object[]{tableModel.getRowCount() + 1, result.getString("p_name"), result.getInt("p_id"),quantityString + " " + unit, String.format("%.2f", result.getFloat("s_price")), String.format("%.2f", quantity * result.getFloat("s_price")), result.getFloat("tax_rate")});
+                    quantityField.setText("");
                     refreshLabel();
                 } catch (Exception excp) {
                     DatabaseCon.showOptionPane(this, excp);
@@ -274,6 +275,7 @@ public class BillingFrame extends JFrame implements ActionListener, KeyListener 
                 }
                 tableModel.setValueAt(quantityUnitString,row,3);
                 tableModel.setValueAt(value,row,5);
+                quantityField.setText("");
                 refreshLabel();
             }
         }else if( e.getSource() == removeItemButton ){
