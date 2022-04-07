@@ -63,7 +63,7 @@ public class AdminFrame extends JFrame implements ActionListener {
         add(newProductButton,setPosition(0,0));
         add(newOperatorButton,setPosition(0,1));
         add(updateProductInfoButton,setPosition(0,2));
-        add(salesHistoryButton,setPosition(0,3));
+//        add(salesHistoryButton,setPosition(0,3));
         add(customerListButton,setPosition(0,4));
         add(discountCodeButton,setPosition(0,5));
         add(deleteDiscountButton,setPosition(0,6));

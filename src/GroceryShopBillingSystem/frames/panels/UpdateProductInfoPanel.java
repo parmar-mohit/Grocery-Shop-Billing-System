@@ -31,7 +31,7 @@ public class UpdateProductInfoPanel extends JPanel implements ActionListener,Win
 
     public UpdateProductInfoPanel(){
         //Initialising Member Variables
-        String columns[] = {"Product Name","Product Code","Selling Price","Cost Price","Inventory","Category","Tax Rate"};
+        String columns[] = {"Product Name","Product Code","Selling Price","Cost Price","Quantity","Category","Tax Rate"};
         tableModel = new DefaultTableModel(columns,0);
         table = new JTable(tableModel){
             @Override
@@ -63,7 +63,7 @@ public class UpdateProductInfoPanel extends JPanel implements ActionListener,Win
         add(scrollPane,setPosition(0,0,2,1));
         add(messageLabel,setPosition(0,1,2,1));
         add(updateProductInfoButton,setPosition(0,2));
-        add(updateCategoryButton,setPosition(1,2));
+//        add(updateCategoryButton,setPosition(1,2));
     }
 
     private void fillTable(){

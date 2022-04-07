@@ -37,7 +37,7 @@ public class NewProductPanel extends JPanel implements KeyListener, ActionListen
         categoryLabel = new JLabel("Category : ");
         categoryCombobox = new JComboBox();
         fillCategoryComboBox();
-        inventoryLabel = new JLabel("Inventory : ");
+        inventoryLabel = new JLabel("Quantity : ");
         inventoryField = new JTextField(30);
         taxLabel = new JLabel("Tax Rate : ");
         taxField = new JTextField(30);
