@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.sql.ResultSet;
 
 import static GroceryShopBillingSystem.Constraint.setPosition;
 
@@ -99,6 +100,13 @@ public class DiscountCodePanel extends JPanel implements KeyListener,ActionListe
             db = new DatabaseCon();
 
             if( db.checkExist("discount_code","discount",discountCode)){
+                ResultSet result = db.executeQuery("SELECT * FROM discount WHERE discount_code = \""+discountCode+"\";");
+                result.next();
+                if( result.getInt("type") == type && result.getInt("value")==Integer.parseInt(value)&&result.getInt("min_pur_amt")==Integer.parseInt(mpa)){
+                    db.activateDiscountCode(discountCode);
+                    messageLabel.setText("Discount Code Activated");
+                    return;
+                }
                 messageLabel.setText("Discount Code Already Exist");
                 return;
             }

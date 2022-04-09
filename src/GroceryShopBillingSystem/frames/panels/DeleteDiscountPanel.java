@@ -80,7 +80,7 @@ public class DeleteDiscountPanel extends JPanel implements ActionListener {
         try{
             db = new DatabaseCon();
 
-            ResultSet result = db.executeQuery("SELECT * FROM discount");
+            ResultSet result = db.executeQuery("SELECT * FROM discount WHERE active = True;");
 
             if( !result.next()  ){
                 messageLabel.setText("No Product Data Found");

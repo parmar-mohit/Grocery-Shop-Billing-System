@@ -153,7 +153,7 @@ public class DatabaseCon {
     }
 
     public void addDiscountCode(String discountCode,int type,int value,int mpa) throws Exception{
-        PreparedStatement preparedStatement = db.prepareStatement("INSERT INTO discount VALUES(?,?,?,?);");
+        PreparedStatement preparedStatement = db.prepareStatement("INSERT INTO discount VALUES(?,?,?,?,True);");
         preparedStatement.setString(1,discountCode);
         preparedStatement.setInt(2,type);
         preparedStatement.setInt(3,value);
@@ -268,7 +268,28 @@ public class DatabaseCon {
     }
 
     public void deleteDiscount(String discountCode) throws Exception{
-        PreparedStatement preparedStatement = db.prepareStatement("DELETE FROM discount WHERE discount_code=?;");
+        PreparedStatement preparedStatement = db.prepareStatement("UPDATE discount SET active = False WHERE discount_code = ?;");
+        preparedStatement.setString(1,discountCode);
+        preparedStatement.executeUpdate();
+    }
+
+    public ResultSet getSalesHistory(java.util.Date sDate, java.util.Date eDate) throws Exception{
+        PreparedStatement preparedStatement = db.prepareStatement("SELECT DISTINCT(p_id) AS product,\n" +
+                "\t(SELECT p_name FROM product AS p_table WHERE p_table.p_id = product),\n" +
+                "\t(SELECT SUM(quantity) FROM bill_contents AS x \n" +
+                "\tWHERE x.p_id = product AND x.b_id IN (SELECT b_id FROM bill WHERE date >= ? AND date <= ?) \n" +
+                "\t) \n" +
+                "FROM bill_contents \n" +
+                "WHERE b_id IN (SELECT b_id FROM bill WHERE date >= ? AND date <= ?) ORDER BY p_id;");
+        preparedStatement.setDate(1,new Date(sDate.getTime()));
+        preparedStatement.setDate(2,new Date(eDate.getTime()));
+        preparedStatement.setDate(3,new Date(sDate.getTime()));
+        preparedStatement.setDate(4,new Date(eDate.getTime()));
+        return preparedStatement.executeQuery();
+    }
+
+    public void activateDiscountCode(String discountCode) throws Exception {
+        PreparedStatement preparedStatement = db.prepareStatement("UPDATE discount SET active = True WHERE discount_code = ?;");
         preparedStatement.setString(1,discountCode);
         preparedStatement.executeUpdate();
     }

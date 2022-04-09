@@ -35,7 +35,8 @@ CREATE TABLE discount (
 	discount_code VARCHAR(50) PRIMARY KEY,
 	type INT NOT NULL,		// 1 for fixed amount 2 for percent type
 	value INT NOT NULL,
-	min_pur_amt INT
+	min_pur_amt INT,
+	active BOOL
 	);
 
 CREATE TABLE bill (
