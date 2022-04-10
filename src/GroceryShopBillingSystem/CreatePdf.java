@@ -10,6 +10,8 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.FileOutputStream;
 import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.stream.Stream;
 
 public class CreatePdf {
@@ -177,6 +179,44 @@ public class CreatePdf {
 
     private static void addTableHeaderCustomer(PdfPTable table) {
         Stream.of("Id","Name","Email","Phone")
+                .forEach(columnTitle -> {
+                    PdfPCell header = new PdfPCell();
+                    header.setBackgroundColor(new BaseColor(60,122,37));
+                    header.setPhrase(new Phrase(columnTitle));
+                    table.addCell(header);
+                });
+    }
+
+    public static void CreateSalesHistory(Date sDate,Date eDate) throws Exception {
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream("Sales History.pdf"));
+        document.open();
+        document.add(new Paragraph("Start Date : "+new SimpleDateFormat("dd-MM-yyyy").format(sDate)));
+        document.add(new Paragraph("End Date : "+new SimpleDateFormat("dd-MM-yyyy").format(eDate)));
+        PdfPTable table = new PdfPTable(3);
+        addTableHeaderSalesHistory(table);
+
+        DatabaseCon db=null;
+        try{
+            db = new DatabaseCon();
+            ResultSet result = db.getSalesHistory(sDate,eDate);
+            while( result.next() ){
+                table.addCell(result.getInt(1)+"");
+                table.addCell(result.getString(2));
+                table.addCell(result.getFloat(3)+"");
+            }
+        }catch(Exception e){
+            System.out.println(e);
+        }finally {
+            db.closeConnection();
+        }
+
+        document.add(table);
+        document.close();
+    }
+
+    private static void addTableHeaderSalesHistory(PdfPTable table) {
+        Stream.of("Product Id","Product Name","Quantity Sold")
                 .forEach(columnTitle -> {
                     PdfPCell header = new PdfPCell();
                     header.setBackgroundColor(new BaseColor(60,122,37));

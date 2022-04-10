@@ -53,8 +53,6 @@ public class CustomerListPanel extends JPanel implements ActionListener {
             messageLabel.setText("Customer List.pdf File Created");
         }catch(Exception excp){
             DatabaseCon.showOptionPane(this,excp);
-        }finally {
-            db.closeConnection();
         }
     }
 

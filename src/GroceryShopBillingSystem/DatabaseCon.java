@@ -3,6 +3,9 @@ package GroceryShopBillingSystem;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.Vector;
 
 public class DatabaseCon {
@@ -287,6 +290,7 @@ public class DatabaseCon {
         preparedStatement.setDate(4,new Date(eDate.getTime()));
         return preparedStatement.executeQuery();
     }
+
 
     public void activateDiscountCode(String discountCode) throws Exception {
         PreparedStatement preparedStatement = db.prepareStatement("UPDATE discount SET active = True WHERE discount_code = ?;");
