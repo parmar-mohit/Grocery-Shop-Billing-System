@@ -291,6 +291,25 @@ public class DatabaseCon {
         return preparedStatement.executeQuery();
     }
 
+    public float dailyQuantitySold(int p_id, java.util.Date date) throws Exception{
+        PreparedStatement preparedStatement = db.prepareStatement("SELECT SUM(quantity) FROM bill_contents WHERE p_id  = ? AND b_id IN (SELECT b_id FROM bill WHERE date = ? );");
+        preparedStatement.setInt(1,p_id);
+        preparedStatement.setDate(2,new Date(date.getTime()));
+        ResultSet result = preparedStatement.executeQuery();
+        result.next();
+        return result.getFloat(1);
+    }
+
+    public ResultSet getIdName(java.util.Date sDate, java.util.Date eDate) throws Exception {
+        PreparedStatement preparedStatement = db.prepareStatement("SELECT DISTINCT(p_id) AS product,\n" +
+                "\t(SELECT p_name FROM product AS p_table WHERE p_table.p_id = product) \n" +
+                "FROM bill_contents \n" +
+                "WHERE b_id IN (SELECT b_id FROM bill WHERE date >= ? AND date <= ?) ORDER BY p_id;");
+        preparedStatement.setDate(1,new Date(sDate.getTime()));
+        preparedStatement.setDate(2,new Date(eDate.getTime()));
+        return preparedStatement.executeQuery();
+    }
+
 
     public void activateDiscountCode(String discountCode) throws Exception {
         PreparedStatement preparedStatement = db.prepareStatement("UPDATE discount SET active = True WHERE discount_code = ?;");

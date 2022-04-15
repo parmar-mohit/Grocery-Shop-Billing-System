@@ -80,5 +80,5 @@ CREATE TABLE product_category (
     UNIQUE(category_name);
     );
 
-ALTER TABlE product
+ALTER TABLE product
 ADD FOREIGN KEY(category) REFERENCES product_category(cat_id) ON DELETE SET NULL;

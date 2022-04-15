@@ -1,16 +1,14 @@
 package GroceryShopBillingSystem;
 
-import com.itextpdf.text.BaseColor;
-import com.itextpdf.text.Document;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.Phrase;
-import com.itextpdf.text.pdf.PdfPCell;
-import com.itextpdf.text.pdf.PdfPTable;
-import com.itextpdf.text.pdf.PdfWriter;
+import com.itextpdf.text.*;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.pdf.*;
 
-import java.io.FileOutputStream;
+import javax.swing.table.DefaultTableModel;
+import java.io.*;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.stream.Stream;
 
@@ -187,12 +185,27 @@ public class CreatePdf {
                 });
     }
 
-    public static void CreateSalesHistory(Date sDate,Date eDate) throws Exception {
+    public static void CreateSalesReport(Date sDate,Date eDate) throws Exception {
+         //Opening File
         Document document = new Document();
-        PdfWriter.getInstance(document, new FileOutputStream("Sales History.pdf"));
+        PdfWriter.getInstance(document, new FileOutputStream("Sales Report.pdf"));
         document.open();
-        document.add(new Paragraph("Start Date : "+new SimpleDateFormat("dd-MM-yyyy").format(sDate)));
-        document.add(new Paragraph("End Date : "+new SimpleDateFormat("dd-MM-yyyy").format(eDate)));
+
+        //Writing "Sales Report" Title
+        Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN,60.0f,Font.BOLD,BaseColor.BLUE);
+        Phrase titlePhrase = new Phrase("Sales Report",titleFont);
+        Paragraph title = new Paragraph(titlePhrase);
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+
+        //Writing Report start and end Date
+        document.add(new Paragraph("\n\n"));
+        Paragraph about = new Paragraph("This Sales Report has Data From Date : "+new SimpleDateFormat("dd-MM-yyyy").format(sDate)+" to Date : "+new SimpleDateFormat("dd-MM-yyyy").format(eDate));
+        about.setAlignment(Element.ALIGN_CENTER);
+        document.add(about);
+
+        //Writing Table of Product Quantity Sold
+        document.add(new Paragraph("\n"));
         PdfPTable table = new PdfPTable(3);
         addTableHeaderSalesHistory(table);
 
@@ -205,13 +218,93 @@ public class CreatePdf {
                 table.addCell(result.getString(2));
                 table.addCell(result.getFloat(3)+"");
             }
+
+            document.add(table);
+
+            String columns[] = {"Date"};
+            DefaultTableModel tableModel = new DefaultTableModel(columns,0);
+            Date currentDate = new Date(sDate.getTime());
+            while( ! currentDate.after(eDate) ) {
+                tableModel.addRow(new Object[]{new SimpleDateFormat("dd-MM-yyyy").format(currentDate)});
+                //Incrementing Date by one day
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(currentDate);
+                calendar.add(Calendar.DATE,1);
+                currentDate = calendar.getTime();
+            }
+
+            //Generating Graph for Product Sales
+            Font subHeadingFont = new Font(Font.FontFamily.TIMES_ROMAN,20.0f,Font.BOLD,BaseColor.RED);
+            ResultSet productIdName = db.getIdName(sDate,eDate);
+
+            int i , j =1;
+            String pNameArray[] = new String[100];
+
+            while( productIdName.next() ){
+                document.newPage();
+                //Getting productId and Name
+                String productName = productIdName.getString(2);
+                int p_id = productIdName.getInt(1);
+                tableModel.addColumn(productName);
+                pNameArray[j-1] = productName;
+
+                //Writing SubHeading
+                Phrase subHeadingPhrase = new Phrase("Sales Graph for "+productName,subHeadingFont);
+                document.add(new Paragraph(subHeadingPhrase));
+                document.add(new Paragraph("\n"));
+
+                //Creating Arguement String for Python Program
+                String argumentString = productName+" ";
+                argumentString += new SimpleDateFormat("dd-MM-yyyy").format(sDate)+" ";
+                argumentString += new SimpleDateFormat("dd-MM-yyyy").format(eDate)+" ";
+                currentDate = new Date(sDate.getTime());
+                i = 0;
+                while( ! currentDate.after(eDate) ){
+                    float quantitySold = db.dailyQuantitySold(p_id,currentDate);
+                    argumentString += quantitySold+" ";
+                    tableModel.setValueAt(quantitySold,i,j);
+
+                    //Incrementing Date by one day
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.setTime(currentDate);
+                    calendar.add(Calendar.DATE,1);
+                    currentDate = calendar.getTime();
+                    i++;
+                }
+
+                //Executing Python Program to Create Graph Image
+                Process process = Runtime.getRuntime().exec("python CreateGraph.py "+argumentString);
+                process.waitFor();
+
+                //Inserting Image into Pdf
+                Image img = new Jpeg(Utilities.toURL("Graph.jpg"));
+                img.setAlignment(Element.ALIGN_CENTER);
+                img.scaleToFit(400,300);
+                document.add(img);
+                j++;
+            }
+
+            document.newPage();
+            document.add(new Paragraph("Quantity Sold Breakdown By Date",subHeadingFont));
+            document.add(new Paragraph("\n\n"));
+            table =  new PdfPTable(j);
+            addTableHeaderProductSales(table,pNameArray,j-1);
+            int k ,l;
+            for( k = 0; k <tableModel.getRowCount(); k++){
+                for( l = 0; l < j; l++){
+                    table.addCell(tableModel.getValueAt(k,l)+"");
+                }
+            }
+
+            //Writing Table;
+            document.add(table);
         }catch(Exception e){
             System.out.println(e);
         }finally {
             db.closeConnection();
         }
 
-        document.add(table);
+        //Closing Document
         document.close();
     }
 
@@ -220,6 +313,21 @@ public class CreatePdf {
                 .forEach(columnTitle -> {
                     PdfPCell header = new PdfPCell();
                     header.setBackgroundColor(new BaseColor(60,122,37));
+                    header.setPhrase(new Phrase(columnTitle));
+                    table.addCell(header);
+                });
+    }
+
+    public static void addTableHeaderProductSales(PdfPTable table,String pNameArray[],int n) {
+         String columns[] = new String[100];
+         columns[0] = "Date";
+         for( int i = 1; i <= n; i++ ){
+             columns[i] = pNameArray[i-1];
+         }
+        Stream.of(columns)
+                .forEach(columnTitle -> {
+                    PdfPCell header = new PdfPCell();
+                    header.setBackgroundColor(new BaseColor(128,166,237));
                     header.setPhrase(new Phrase(columnTitle));
                     table.addCell(header);
                 });

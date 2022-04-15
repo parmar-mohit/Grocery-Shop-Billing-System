@@ -21,7 +21,7 @@ public class SalesHistoryPanel extends JPanel implements ActionListener {
     private JTable table;
     private JScrollPane scrollPane;
     private JLabel messageLabel,startDateLabel,endDateLabel;
-    private JButton viewHistoryButton, exportPdfButton;
+    private JButton viewHistoryButton, generateReportButton;
     private DatabaseCon db;
 
     public SalesHistoryPanel(){
@@ -41,7 +41,7 @@ public class SalesHistoryPanel extends JPanel implements ActionListener {
         };
         scrollPane = new JScrollPane(table);
         messageLabel = new JLabel();
-        exportPdfButton = new JButton("Export as Pdf");
+        generateReportButton = new JButton("Generate Report");
 
         //Editing Table Details
         table.setColumnSelectionAllowed(false);
@@ -57,7 +57,7 @@ public class SalesHistoryPanel extends JPanel implements ActionListener {
 
         //AddingActionListener
         viewHistoryButton.addActionListener(this);
-        exportPdfButton.addActionListener(this);
+        generateReportButton.addActionListener(this);
 
         //Editing panel details
         setBackground(new Color(148,212,66));
@@ -66,7 +66,7 @@ public class SalesHistoryPanel extends JPanel implements ActionListener {
         //Adding Member to Panel
         add(startDateLabel,setPosition(0,0));add(startDate,setPosition(1,0));
         add(endDateLabel,setPosition(2,0));add(endDate,setPosition(3,0));
-        add(viewHistoryButton,setPosition(0,1,2,1));add(exportPdfButton,setPosition(2,1,2,1));
+        add(viewHistoryButton,setPosition(0,1,2,1));add(generateReportButton,setPosition(2,1,2,1));
         add(scrollPane,setPosition(0,2,4,1));
         add(messageLabel,setPosition(0,3,2,1));
     }
@@ -112,10 +112,10 @@ public class SalesHistoryPanel extends JPanel implements ActionListener {
             }finally {
                 db.closeConnection();
             }
-        }else if( e.getSource() == exportPdfButton ){
+        }else if( e.getSource() == generateReportButton){
             try{
-                CreatePdf.CreateSalesHistory(sDate,eDate);
-                messageLabel.setText("Sales History.pdf File Created");
+                CreatePdf.CreateSalesReport(sDate,eDate);
+                messageLabel.setText("Sales Report.pdf File Created");
             }catch(Exception excp ){
                 DatabaseCon.showOptionPane(this,excp);
             }
