@@ -254,7 +254,7 @@ public class CreatePdf {
                 document.add(new Paragraph("\n"));
 
                 //Creating Arguement String for Python Program
-                String argumentString = productName+" ";
+                String argumentString = "\""+productName+"\" ";
                 argumentString += new SimpleDateFormat("dd-MM-yyyy").format(sDate)+" ";
                 argumentString += new SimpleDateFormat("dd-MM-yyyy").format(eDate)+" ";
                 currentDate = new Date(sDate.getTime());

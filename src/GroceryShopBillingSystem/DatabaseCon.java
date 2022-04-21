@@ -225,7 +225,7 @@ public class DatabaseCon {
             String quantityString = tableModel.getValueAt(i,3)+"";
             String quantityArray[] = quantityString.split(" ",5);
             float inventory = Float.parseFloat(quantityArray[0]);
-            if( quantityArray[1].equals("Gms") || quantityArray[1].equals("Milli Ltr") ){
+            if( quantityArray[1].equals("Gms") || quantityArray[1].equals("Milli") ){
                 inventory /= 1000;
             }
 

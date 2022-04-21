@@ -43,7 +43,12 @@ public class BillingFrame extends JFrame implements ActionListener, KeyListener 
         logoutButton = new JButton("Logout");
         String columns[] = {"Sr No","Particulars","Product Id","Quantity","Rate","Value","Tax (%) "};
         tableModel = new DefaultTableModel(columns,0);
-        table = new JTable(tableModel);
+        table = new JTable(tableModel){
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
         scrollPane = new JScrollPane(table);
         subTotalLabel = new JLabel("Sub Total : 0");
         taxLabel = new JLabel("Tax : 0");
@@ -218,7 +223,7 @@ public class BillingFrame extends JFrame implements ActionListener, KeyListener 
 
             String unit = unitCombobox.getSelectedItem()+"";
             if( unit.equals("Gms") || unit.equals("Milli Ltr") ){
-                quantity /= 1000;
+                quantity /= (float)1000;
             }
 
             int row = checkExist(productId);
@@ -365,7 +370,7 @@ public class BillingFrame extends JFrame implements ActionListener, KeyListener 
                 String quantityString = tableModel.getValueAt(i,3)+"";
                 String quantityArray[] = quantityString.split(" ",5);
                 float inventory = Float.parseFloat(quantityArray[0]);
-                if( quantityArray[1].equals("Gms") || quantityArray[1].equals("Milli Ltr") ){
+                if( quantityArray[1].equals("Gms") || quantityArray[1].equals("Milli") ){
                     inventory /= 1000;
                 }
 
