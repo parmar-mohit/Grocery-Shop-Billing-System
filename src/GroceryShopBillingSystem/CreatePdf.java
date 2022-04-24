@@ -284,7 +284,7 @@ public class CreatePdf {
                 j++;
             }
 
-            document.newPage();
+            /*document.newPage();
             document.add(new Paragraph("Quantity Sold Breakdown By Date",subHeadingFont));
             document.add(new Paragraph("\n\n"));
             table =  new PdfPTable(j);
@@ -297,7 +297,7 @@ public class CreatePdf {
             }
 
             //Writing Table;
-            document.add(table);
+            document.add(table);*/
         }catch(Exception e){
             System.out.println(e);
         }finally {
